@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackPDF</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="brand-panel" aria-labelledby="page-title">
+      <div class="brand-mark" aria-hidden="true">
+        <span>PDF</span>
+      </div>
+      <div>
+        <div class="eyebrow">Utility Tool</div>
+        <h1 id="page-title">StackPDF</h1>
+        <p class="subtitle">Convert zipped eDetailer and email packages into polished PDF outputs with a cleaner workflow.</p>
+      </div>
+
+      <div class="workflow-list" aria-label="Workflow">
+        <div class="workflow-item">
+          <span class="workflow-number">01</span>
+          <span>Upload package ZIP</span>
+        </div>
+        <div class="workflow-item">
+          <span class="workflow-number">02</span>
+          <span>Generate PDFs</span>
+        </div>
+        <div class="workflow-item">
+          <span class="workflow-number">03</span>
+          <span>Download output</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace-panel" aria-label="PDF generator workspace">
+      <header class="panel-header">
+        <div>
+          <div class="section-kicker">Package Input</div>
+          <h2>Upload ZIP</h2>
+        </div>
+        <div class="status-pill">
+          <span class="status-dot" id="statusDot"></span>
+          <span>Ready</span>
+        </div>
+      </header>
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".zip" aria-label="Upload ZIP package">
+        <div class="drop-default">
+          <span class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H10l2 2.25h5.5A2.5 2.5 0 0 1 20 9.75v6.75A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M12 15V10m0 0-2 2m2-2 2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="drop-title">Drop your package ZIP here</div>
+          <div class="drop-label">or <span>browse files</span> from your machine</div>
+        </div>
+        <div class="upload-status">
+          <div class="spinner"></div>
+          <div class="upload-label">Uploading package</div>
+          <div class="upload-filename" id="uploadingName"></div>
+        </div>
+      </div>
+
+      <div class="upload-success" id="uploadSuccess">
+        <span class="upload-success-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="m6.5 12.5 3.2 3.2 7.8-8.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <div class="upload-success-body">
+          <div class="upload-success-title">Upload successful</div>
+          <div class="upload-success-name" id="uploadSuccessName"></div>
+        </div>
+        <button class="change-btn" id="changeBtn">Change</button>
+      </div>
+
+      <div class="action-bar">
+        <div class="progress-bar-wrap" id="progressWrap">
+          <div class="progress-bar indeterminate"></div>
+        </div>
+        <button id="genBtn" onclick="startGeneration()">Generate PDF</button>
+      </div>
+
+      <section class="log-panel" aria-label="Output log">
+        <div class="log-header">
+          <div>
+            <div class="section-kicker">Live Status</div>
+            <div class="log-title">Output Log</div>
+          </div>
+        </div>
+        <div id="logs"><span class="empty-state">Awaiting input...</span></div>
+      </section>
+
+      <div class="download-section" id="downloadSection">
+        <div class="download-banner" id="downloadSingle" style="display:none;">
+          <span class="download-banner-text">PDF ready</span>
+          <a class="download-btn" id="downloadBtnSingle" href="#" download="output.pdf">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.5 1.5v8M4.5 7l3 3 3-3M2 12.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download PDF
+          </a>
+        </div>
+
+        <div class="download-email" id="downloadEmail" style="display:none;">
+          <div class="download-email-title">PDFs ready. Choose a view to download.</div>
+          <div class="download-email-btns">
+            <a class="download-btn" id="downloadBtnDesktop" href="#" download="email_desktop.pdf">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.5 1.5v8M4.5 7l3 3 3-3M2 12.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Desktop 600px
+            </a>
+            <a class="download-btn secondary" id="downloadBtnMobile" href="#" download="email_mobile.pdf">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.5 1.5v8M4.5 7l3 3 3-3M2 12.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Mobile 360px
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

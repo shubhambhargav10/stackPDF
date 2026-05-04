@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.playwright-browsers/
+
+build/
+dist/
+*.spec
+
+Archive.zip
+temp_pdf/
+final_output.pdf

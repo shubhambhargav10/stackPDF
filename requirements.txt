@@ -1,0 +1,13 @@
+# Python packages for StackPDF.
+#
+# The build script installs and bundles Playwright Chromium automatically.
+# For development without building, install Chromium manually:
+#   python -m playwright install chromium
+#
+# Windows users also need Python installed first. Most Windows 10/11 machines
+# already include Microsoft Edge WebView2 Runtime for the desktop window.
+Flask
+playwright
+PyPDF2
+pywebview
+pyinstaller
