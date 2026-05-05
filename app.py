@@ -112,7 +112,7 @@ def generate():
                 yield f'data:{message}\n\n'
             yield 'data: DONE\n\n'
         except Exception as e:
-            yield f'data:❌ ERROR: {str(e)}\n\n'
+            yield f'data:Oops! ERROR: {str(e)}\n\n'
 
     return Response(stream(), mimetype='text/event-stream')
 

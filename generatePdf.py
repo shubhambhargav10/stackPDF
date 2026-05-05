@@ -1,10 +1,28 @@
 import os
 import json
+import sys
+import builtins
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from PyPDF2 import PdfMerger
 
 PARENT_FOLDER = ""
+
+
+def safe_print(*args, **kwargs):
+    try:
+        builtins.print(*args, **kwargs)
+    except UnicodeEncodeError:
+        output = kwargs.get("sep", " ").join(str(arg) for arg in args)
+        end = kwargs.get("end", "\n")
+        file = kwargs.get("file") or sys.stdout
+        if file is None:
+            return
+        encoding = getattr(file, "encoding", None) or "utf-8"
+        safe_output = output.encode(encoding, errors="replace").decode(encoding, errors="replace")
+        file.write(safe_output + end)
+        if kwargs.get("flush"):
+            file.flush()
 
 
 def merge_pdfs(OUTPUT_DIR, PARENT_FOLDER, stream=False):
@@ -15,7 +33,7 @@ def merge_pdfs(OUTPUT_DIR, PARENT_FOLDER, stream=False):
         if f.endswith(".pdf")
     ])
     if not pdf_files:
-        msg = "❌ No PDFs generated. Check input folder."
+        msg = "Oops! No PDFs generated. Check input folder."
         if stream:
             yield msg
             return
@@ -28,8 +46,8 @@ def merge_pdfs(OUTPUT_DIR, PARENT_FOLDER, stream=False):
     output_path = os.path.join(PARENT_FOLDER, "final_output.pdf")
     merger.write(output_path)
     merger.close()
-    msg = f"🎉 Final PDF created: {output_path}"
-    print(msg)
+    msg = f"Yayy!Final PDF created: {output_path}"
+    safe_print(msg)
     if stream:
         yield msg
         return
@@ -78,15 +96,15 @@ def detect_package_type(PARENT_FOLDER):
 
 def generate_pdf(PARENT_FOLDER, stream=False):
     if not os.path.exists(PARENT_FOLDER):
-        msg = f"❌ Invalid folder path: {PARENT_FOLDER}"
-        print(msg)
+        msg = f"Oops! Invalid folder path: {PARENT_FOLDER}"
+        safe_print(msg)
         if stream:
             yield msg
             return
         else:
             raise Exception(msg)
     if not os.path.isdir(PARENT_FOLDER):
-        msg = f"❌ Not a folder: {PARENT_FOLDER}"
+        msg = f"Oops! Not a folder: {PARENT_FOLDER}"
         if stream:
             yield msg
             return
@@ -101,24 +119,24 @@ def generate_pdf(PARENT_FOLDER, stream=False):
     if os.path.exists(CONFIG_PATH):
         with open(CONFIG_PATH, "r") as f:
             config = json.load(f)
-        print("✅ Using project config")
+        safe_print("Great! Using project config")
     else:
-        print("⚠️ No config found")
+        safe_print("⚠️ No config found")
 
     # ── Detect package type ──
     package_type, items = detect_package_type(PARENT_FOLDER)
-    print(f"📦 Package type: {package_type} | items: {items}")
+    safe_print(f"Package Package type: {package_type} | items: {items}")
 
     if package_type == "unknown":
-        msg = "❌ No HTML files found. Make sure your zip contains .html files."
+        msg = "Oops! No HTML files found. Make sure your zip contains .html files."
         if stream:
             yield msg
             return
         else:
             raise Exception(msg)
 
-    msg = f"📦 Detected: {package_type.upper()} ({len(items)} item(s))"
-    print(msg)
+    msg = f"Package Detected: {package_type.upper()} ({len(items)} item(s))"
+    safe_print(msg)
     if stream:
         yield msg
 
@@ -133,43 +151,43 @@ def generate_pdf(PARENT_FOLDER, stream=False):
             page.set_viewport_size({"width": 1366, "height": 1024})
 
             folders = items
-            print("Folders found:", folders)
+            safe_print("Folders found:", folders)
 
             for folder in folders:
-                print(f"\n--- START {folder} ---")
+                safe_print(f"\n--- START {folder} ---")
                 folder_path = os.path.join(PARENT_FOLDER, folder)
 
-                print("Listing files...")
+                safe_print("Listing files...")
                 files = os.listdir(folder_path)
-                print("Files found:", files)
+                safe_print("Files found:", files)
 
                 html_files = []
                 for htmfile in os.listdir(folder_path):
                     if htmfile.endswith(".html"):
                         html_files.append(htmfile)
-                        print("HTML files:", html_files)
+                        safe_print("HTML files:", html_files)
 
                 if not html_files:
-                    print("⚠️ No HTML file found in", folder)
+                    safe_print("⚠️ No HTML file found in", folder)
                     msg = f"⚠️ No HTML file found in {folder}"
                     if stream:
                         yield msg
                     else:
-                        print(msg)
+                        safe_print(msg)
                     continue
 
                 html_path = os.path.join(folder_path, html_files[0])
-                print("Using HTML file:", html_path)
+                safe_print("Using HTML file:", html_path)
 
                 file_url = Path(html_path).absolute().as_uri()
-                print("File URL:", file_url)
+                safe_print("File URL:", file_url)
 
                 msg = f"📂 Processing {folder}"
                 if stream:
                     yield msg
 
                 states = config.get(folder, [{"type": "base"}])
-                print(f"States {states}")
+                safe_print(f"States {states}")
 
                 state_index = 0
 
@@ -206,7 +224,7 @@ def generate_pdf(PARENT_FOLDER, stream=False):
                                     """, step["y"])
                                     page.wait_for_timeout(300)
                             except Exception as e:
-                                print("⚠️ Error:", e)
+                                safe_print("⚠️ Error:", e)
 
                     pdf_path = os.path.join(OUTPUT_DIR, f"{folder}_{state_index}.pdf")
                     page.pdf(
@@ -215,8 +233,8 @@ def generate_pdf(PARENT_FOLDER, stream=False):
                         width="1366px",
                         height="1024px"
                     )
-                    msg = f"✅ Saved {folder}_{state_index}.pdf"
-                    print(msg)
+                    msg = f"Great! Saved {folder}_{state_index}.pdf"
+                    safe_print(msg)
                     if stream:
                         yield msg
 
@@ -238,13 +256,13 @@ def generate_pdf(PARENT_FOLDER, stream=False):
                 file_url  = Path(html_path).absolute().as_uri()
 
                 msg = f"📧 Processing email: {html_file}"
-                print(msg)
+                safe_print(msg)
                 if stream:
                     yield msg
 
                 for view_name, viewport_width in views:
                     msg = f"   ↳ Rendering {view_name} view ({viewport_width}px)…"
-                    print(msg)
+                    safe_print(msg)
                     if stream:
                         yield msg
 
@@ -295,8 +313,8 @@ def generate_pdf(PARENT_FOLDER, stream=False):
 
                     page.close()
 
-                    msg = f"✅ Saved {pdf_filename}"
-                    print(msg)
+                    msg = f"Great! Saved {pdf_filename}"
+                    safe_print(msg)
                     if stream:
                         yield msg
 

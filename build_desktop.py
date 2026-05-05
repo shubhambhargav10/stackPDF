@@ -41,7 +41,18 @@ def copy_playwright_browser():
     shutil.copytree(BROWSER_DIR, destination, symlinks=True)
 
 
+def clean_previous_build():
+    for path in [ROOT / 'build', ROOT / 'dist', ROOT / f'{APP_NAME}.spec']:
+        if path.is_dir():
+            print('Removing old folder:', path)
+            shutil.rmtree(path)
+        elif path.exists():
+            print('Removing old file:', path)
+            path.unlink()
+
+
 def main():
+    clean_previous_build()
     install_playwright_browser()
 
     command = [
@@ -50,6 +61,8 @@ def main():
         'PyInstaller',
         '--noconfirm',
         '--clean',
+        '--noupx',
+        '--onedir',
         '--windowed',
         '--name',
         APP_NAME,
