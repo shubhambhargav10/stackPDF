@@ -80,9 +80,19 @@ def upload():
     dest = os.path.join(UPLOAD_BASE, 'pdfgen_' + uuid.uuid4().hex)
     os.makedirs(dest, exist_ok=True)
 
+    # try:
+    #     with zipfile.ZipFile(f.stream) as zf:
+    #         zf.extractall(dest)
+    # except zipfile.BadZipFile:
+    #     return jsonify({'error': 'Invalid or corrupt ZIP file.'}), 400
+
     try:
-        with zipfile.ZipFile(f.stream) as zf:
+        zip_path = os.path.join(dest, f.filename)
+        f.save(zip_path)
+
+        with zipfile.ZipFile(zip_path, 'r') as zf:
             zf.extractall(dest)
+
     except zipfile.BadZipFile:
         return jsonify({'error': 'Invalid or corrupt ZIP file.'}), 400
 
@@ -112,7 +122,7 @@ def generate():
                 yield f'data:{message}\n\n'
             yield 'data: DONE\n\n'
         except Exception as e:
-            yield f'data:❌ ERROR: {str(e)}\n\n'
+            yield f'data:Oops! ERROR: {str(e)}\n\n'
 
     return Response(stream(), mimetype='text/event-stream')
 

@@ -18,4 +18,5 @@ exit /b 0
 :error
 echo.
 echo Build failed. Make sure Python is installed and available as "python".
+echo If "python" is not recognized, try checking "py --version" or reinstall Python with "Add python.exe to PATH" enabled.
 exit /b 1
