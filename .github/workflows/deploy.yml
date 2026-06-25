@@ -1,4 +1,4 @@
-name : Deploy StackPDF
+name: Deploy StackPDF
 
 on:
   push:
@@ -7,15 +7,18 @@ on:
 
 jobs:
   deploy:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
+
     steps:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.5
+
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script:
+
+          script: |
             cd /home/ec2-user/projects/stackPDF
             git pull origin main
             sudo systemctl restart stackpdf
